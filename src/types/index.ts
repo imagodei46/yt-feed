@@ -14,6 +14,8 @@ export interface Video {
   channelName: string;
   viewCount?: number;
   likeCount?: number;
+  duration?: number;
+  isShorts?: boolean;
 }
 
 export interface VideoWithSummary extends Video {
