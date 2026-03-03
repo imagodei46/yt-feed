@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { Video } from "@/types";
 import ChannelFilter from "./ChannelFilter";
 import VideoGrid from "./VideoGrid";
@@ -22,6 +22,10 @@ export default function Dashboard({ videos }: DashboardProps) {
   const [sortMode, setSortMode] = useState<SortMode>("date");
   const [viewMode, setViewMode] = useState<ViewMode>("feed");
   const [keywordVideoIds, setKeywordVideoIds] = useState<string[] | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleRefreshStart = useCallback(() => setIsRefreshing(true), []);
+  const handleRefreshEnd = useCallback(() => setIsRefreshing(false), []);
 
   const sortedVideos = useMemo(() => {
     let filtered = selectedChannel
@@ -112,10 +116,28 @@ export default function Dashboard({ videos }: DashboardProps) {
                   조회수순
                 </button>
               </div>
-              <RefreshButton />
+              <RefreshButton onRefreshStart={handleRefreshStart} onRefreshEnd={handleRefreshEnd} />
             </div>
           </div>
-          <VideoGrid videos={sortedVideos} />
+          {isRefreshing ? (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="overflow-hidden rounded-xl border border-slate-800 bg-slate-900">
+                  <div className="aspect-video w-full animate-pulse bg-slate-800" />
+                  <div className="p-4 space-y-2">
+                    <div className="h-4 w-3/4 animate-pulse rounded bg-slate-700" />
+                    <div className="h-4 w-1/2 animate-pulse rounded bg-slate-800" />
+                    <div className="flex gap-2">
+                      <div className="h-5 w-16 animate-pulse rounded bg-slate-800" />
+                      <div className="h-5 w-12 animate-pulse rounded bg-slate-800" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <VideoGrid videos={sortedVideos} />
+          )}
         </>
       ) : (
         <>
@@ -123,7 +145,7 @@ export default function Dashboard({ videos }: DashboardProps) {
             <p className="text-sm text-slate-400">
               채널별 조회수 기준 인기 영상
             </p>
-            <RefreshButton />
+            <RefreshButton onRefreshStart={handleRefreshStart} onRefreshEnd={handleRefreshEnd} />
           </div>
           <ChannelTop3 videos={videos} />
         </>

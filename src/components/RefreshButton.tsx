@@ -3,15 +3,24 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function RefreshButton() {
+interface RefreshButtonProps {
+  onRefreshStart?: () => void;
+  onRefreshEnd?: () => void;
+}
+
+export default function RefreshButton({ onRefreshStart, onRefreshEnd }: RefreshButtonProps) {
   const router = useRouter();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   async function handleRefresh() {
     setIsRefreshing(true);
+    onRefreshStart?.();
     router.refresh();
     // Give time for the server to refetch
-    setTimeout(() => setIsRefreshing(false), 1500);
+    setTimeout(() => {
+      setIsRefreshing(false);
+      onRefreshEnd?.();
+    }, 1500);
   }
 
   return (
