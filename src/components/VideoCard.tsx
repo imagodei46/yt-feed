@@ -17,46 +17,14 @@ interface VideoCardProps {
 }
 
 export default function VideoCard({ video }: VideoCardProps) {
-  const videoUrl = video.isShorts
-    ? `https://www.youtube.com/shorts/${video.id}`
-    : `https://www.youtube.com/watch?v=${video.id}`;
-
-  if (video.isShorts) {
-    return (
-      <article className="flex flex-col overflow-hidden rounded-xl border border-slate-800 bg-slate-900 transition-shadow hover:shadow-lg hover:shadow-slate-900/50">
-        <a href={videoUrl} target="_blank" rel="noopener noreferrer" className="block">
-          <div className="relative aspect-[9/16] w-full overflow-hidden bg-slate-800">
-            <Image
-              src={video.thumbnailUrl}
-              alt={video.title}
-              fill
-              sizes="(max-width: 640px) 50vw, 25vw"
-              className="object-cover transition-transform hover:scale-105"
-            />
-          </div>
-        </a>
-        <div className="p-3">
-          <a href={videoUrl} target="_blank" rel="noopener noreferrer" className="block">
-            <h3 className="line-clamp-1 text-xs font-semibold leading-snug text-slate-100 hover:text-blue-400 transition-colors">
-              {video.title}
-            </h3>
-          </a>
-          <div className="mt-1.5 flex items-center gap-1.5 text-[10px] text-slate-400">
-            <span className={`rounded px-1.5 py-0.5 font-medium ${CHANNEL_COLORS[video.channelName] ?? "bg-slate-700 text-slate-300"}`}>
-              {video.channelName}
-            </span>
-            {video.viewCount !== undefined && (
-              <span>&#9655; {formatCount(video.viewCount)}</span>
-            )}
-          </div>
-        </div>
-      </article>
-    );
-  }
-
   return (
     <article className="flex flex-col overflow-hidden rounded-xl border border-slate-800 bg-slate-900 transition-shadow hover:shadow-lg hover:shadow-slate-900/50">
-      <a href={videoUrl} target="_blank" rel="noopener noreferrer" className="block">
+      <a
+        href={`https://www.youtube.com/watch?v=${video.id}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block"
+      >
         <div className="relative aspect-video w-full overflow-hidden bg-slate-800">
           <Image
             src={video.thumbnailUrl}
@@ -68,7 +36,12 @@ export default function VideoCard({ video }: VideoCardProps) {
         </div>
       </a>
       <div className="flex flex-1 flex-col p-4">
-        <a href={videoUrl} target="_blank" rel="noopener noreferrer" className="block">
+        <a
+          href={`https://www.youtube.com/watch?v=${video.id}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block"
+        >
           <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-slate-100 hover:text-blue-400 transition-colors">
             {video.title}
           </h3>

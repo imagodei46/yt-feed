@@ -45,16 +45,6 @@ export default function Dashboard({ videos }: DashboardProps) {
     });
   }, [videos, selectedChannel, sortMode, keywordVideoIds]);
 
-  const longformVideos = useMemo(
-    () => sortedVideos.filter((v) => !v.isShorts),
-    [sortedVideos]
-  );
-
-  const shortformVideos = useMemo(
-    () => sortedVideos.filter((v) => v.isShorts),
-    [sortedVideos]
-  );
-
   return (
     <div className="space-y-6">
       {/* View mode tabs */}
@@ -130,64 +120,23 @@ export default function Dashboard({ videos }: DashboardProps) {
             </div>
           </div>
           {isRefreshing ? (
-            <div className="space-y-8">
-              {/* Longform skeleton */}
-              <div className="space-y-3">
-                <div className="h-4 w-28 animate-pulse rounded bg-slate-700" />
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {Array.from({ length: 6 }).map((_, i) => (
-                    <div key={i} className="overflow-hidden rounded-xl border border-slate-800 bg-slate-900">
-                      <div className="aspect-video w-full animate-pulse bg-slate-800" />
-                      <div className="p-4 space-y-2">
-                        <div className="h-4 w-3/4 animate-pulse rounded bg-slate-700" />
-                        <div className="h-4 w-1/2 animate-pulse rounded bg-slate-800" />
-                        <div className="flex gap-2">
-                          <div className="h-5 w-16 animate-pulse rounded bg-slate-800" />
-                          <div className="h-5 w-12 animate-pulse rounded bg-slate-800" />
-                        </div>
-                      </div>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="overflow-hidden rounded-xl border border-slate-800 bg-slate-900">
+                  <div className="aspect-video w-full animate-pulse bg-slate-800" />
+                  <div className="p-4 space-y-2">
+                    <div className="h-4 w-3/4 animate-pulse rounded bg-slate-700" />
+                    <div className="h-4 w-1/2 animate-pulse rounded bg-slate-800" />
+                    <div className="flex gap-2">
+                      <div className="h-5 w-16 animate-pulse rounded bg-slate-800" />
+                      <div className="h-5 w-12 animate-pulse rounded bg-slate-800" />
                     </div>
-                  ))}
+                  </div>
                 </div>
-              </div>
-              {/* Shortform skeleton */}
-              <div className="space-y-3">
-                <div className="h-4 w-24 animate-pulse rounded bg-slate-700" />
-                <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <div key={`shorts-${i}`} className="overflow-hidden rounded-xl border border-slate-800 bg-slate-900">
-                      <div className="aspect-[9/16] w-full animate-pulse bg-slate-800" />
-                      <div className="p-3 space-y-1.5">
-                        <div className="h-3 w-3/4 animate-pulse rounded bg-slate-700" />
-                        <div className="h-3 w-1/2 animate-pulse rounded bg-slate-800" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              ))}
             </div>
           ) : (
-            <div className="space-y-8">
-              {longformVideos.length > 0 && (
-                <div className="space-y-3">
-                  <h2 className="text-sm font-medium text-slate-300">
-                    롱폼 영상
-                    <span className="ml-2 text-slate-500">{longformVideos.length}</span>
-                  </h2>
-                  <VideoGrid videos={longformVideos} />
-                </div>
-              )}
-
-              {shortformVideos.length > 0 && (
-                <div className="space-y-3">
-                  <h2 className="text-sm font-medium text-slate-300">
-                    숏폼 영상
-                    <span className="ml-2 text-slate-500">{shortformVideos.length}</span>
-                  </h2>
-                  <VideoGrid videos={shortformVideos} variant="shortform" />
-                </div>
-              )}
-            </div>
+            <VideoGrid videos={sortedVideos} />
           )}
         </>
       ) : (
