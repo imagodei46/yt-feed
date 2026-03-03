@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Video } from "@/types";
 
 interface WeeklyBriefingProps {
@@ -11,6 +11,16 @@ export default function WeeklyBriefing({ videos }: WeeklyBriefingProps) {
   const [briefing, setBriefing] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [expandedItems, setExpandedItems] = useState<Set<number>>(new Set());
+
+  const toggleItem = useCallback((index: number) => {
+    setExpandedItems((prev) => {
+      const next = new Set(prev);
+      if (next.has(index)) next.delete(index);
+      else next.add(index);
+      return next;
+    });
+  }, []);
 
   useEffect(() => {
     if (videos.length === 0) return;
@@ -87,13 +97,21 @@ export default function WeeklyBriefing({ videos }: WeeklyBriefingProps) {
           const formatted = text
             .replace(/\*\*(.+?)\*\*/g, "<strong class='text-white'>$1</strong>")
             .trim();
+          const isExpanded = expandedItems.has(i);
           return formatted ? (
-            <div key={i} className="flex gap-2.5">
+            <button
+              key={i}
+              onClick={() => toggleItem(i)}
+              className="flex w-full gap-2.5 text-left"
+            >
               <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-400/20 text-xs font-bold text-amber-400">
                 {i + 1}
               </span>
-              <p className="line-clamp-2" dangerouslySetInnerHTML={{ __html: formatted }} />
-            </div>
+              <p
+                className={isExpanded ? "" : "line-clamp-2"}
+                dangerouslySetInnerHTML={{ __html: formatted }}
+              />
+            </button>
           ) : null;
         })}
       </div>

@@ -3,6 +3,10 @@
 :root {
   --background: #0b1120;
   --foreground: #e2e8f0;
+  /* Dark theme layer tokens */
+  --bg-primary: #0b1120;    /* page background */
+  --bg-secondary: #0f172a;  /* slate-900 equivalent — cards, header */
+  --bg-elevated: #1e293b;   /* slate-800 equivalent — hover, inputs */
 }
 
 @theme inline {

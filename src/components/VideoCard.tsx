@@ -18,7 +18,7 @@ interface VideoCardProps {
 
 export default function VideoCard({ video }: VideoCardProps) {
   return (
-    <article className="overflow-hidden rounded-xl border border-slate-800 bg-slate-900 transition-shadow hover:shadow-lg hover:shadow-slate-900/50">
+    <article className="flex flex-col overflow-hidden rounded-xl border border-slate-800 bg-slate-900 transition-shadow hover:shadow-lg hover:shadow-slate-900/50">
       <a
         href={`https://www.youtube.com/watch?v=${video.id}`}
         target="_blank"
@@ -35,7 +35,7 @@ export default function VideoCard({ video }: VideoCardProps) {
           />
         </div>
       </a>
-      <div className="p-4">
+      <div className="flex flex-1 flex-col p-4">
         <a
           href={`https://www.youtube.com/watch?v=${video.id}`}
           target="_blank"
@@ -62,11 +62,13 @@ export default function VideoCard({ video }: VideoCardProps) {
             )}
           </div>
         )}
-        <SummarySection
-          videoId={video.id}
-          title={video.title}
-          description={video.description}
-        />
+        <div className="mt-auto">
+          <SummarySection
+            videoId={video.id}
+            title={video.title}
+            description={video.description}
+          />
+        </div>
       </div>
     </article>
   );

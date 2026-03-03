@@ -11,6 +11,7 @@ interface ChannelGroup {
   channelId: string;
   channelName: string;
   topVideos: Video[];
+  totalViews: number;
 }
 
 export default function ChannelTop3({ videos }: ChannelTop3Props) {
@@ -28,10 +29,12 @@ export default function ChannelTop3({ videos }: ChannelTop3Props) {
       const sorted = [...channelVideos].sort(
         (a, b) => (b.viewCount ?? 0) - (a.viewCount ?? 0)
       );
+      const topVideos = sorted.slice(0, 3);
       groups.push({
         channelId,
         channelName: sorted[0].channelName,
-        topVideos: sorted.slice(0, 3),
+        topVideos,
+        totalViews: topVideos.reduce((sum, v) => sum + (v.viewCount ?? 0), 0),
       });
     }
 
@@ -59,8 +62,11 @@ export default function ChannelTop3({ videos }: ChannelTop3Props) {
           key={group.channelId}
           className="rounded-xl border border-slate-800 bg-slate-900 p-5"
         >
-          <h3 className="mb-4 text-base font-bold text-white">
+          <h3 className="mb-4 flex items-baseline gap-2 text-base font-bold text-white">
             {group.channelName}
+            <span className="text-xs font-normal text-slate-500">
+              총 {formatCount(group.totalViews)}회
+            </span>
           </h3>
           <div className="space-y-3">
             {group.topVideos.map((video, index) => (
