@@ -2,6 +2,15 @@ import { Video, Channel } from "@/types";
 
 const YOUTUBE_API_BASE = "https://www.googleapis.com/youtube/v3";
 
+function parseISO8601Duration(iso: string): number {
+  const match = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+  if (!match) return 0;
+  const hours = parseInt(match[1] || "0", 10);
+  const minutes = parseInt(match[2] || "0", 10);
+  const seconds = parseInt(match[3] || "0", 10);
+  return hours * 3600 + minutes * 60 + seconds;
+}
+
 interface PlaylistItemSnippet {
   title: string;
   description: string;
@@ -33,6 +42,9 @@ interface VideosResponse {
   items: Array<{
     id: string;
     statistics: VideoStatistics;
+    contentDetails?: {
+      duration?: string;
+    };
   }>;
 }
 
@@ -63,11 +75,12 @@ export async function fetchChannelVideos(
   const data: PlaylistItemsResponse = await res.json();
 
   const videoIds = data.items.map((item) => item.snippet.resourceId.videoId);
-  const statsMap = await fetchVideoStatistics(videoIds);
+  const detailsMap = await fetchVideoDetails(videoIds);
 
   return data.items.map((item) => {
     const videoId = item.snippet.resourceId.videoId;
-    const stats = statsMap.get(videoId);
+    const detail = detailsMap.get(videoId);
+    const duration = detail?.duration ?? 0;
     return {
       id: videoId,
       title: item.snippet.title,
@@ -80,20 +93,22 @@ export async function fetchChannelVideos(
       publishedAt: item.snippet.publishedAt,
       channelId: channel.id,
       channelName: channel.name,
-      viewCount: stats?.viewCount ? Number(stats.viewCount) : undefined,
-      likeCount: stats?.likeCount ? Number(stats.likeCount) : undefined,
+      viewCount: detail?.statistics.viewCount ? Number(detail.statistics.viewCount) : undefined,
+      likeCount: detail?.statistics.likeCount ? Number(detail.statistics.likeCount) : undefined,
+      duration,
+      isShorts: duration > 0 && duration <= 60,
     };
   });
 }
 
-async function fetchVideoStatistics(
+async function fetchVideoDetails(
   videoIds: string[]
-): Promise<Map<string, VideoStatistics>> {
+): Promise<Map<string, { statistics: VideoStatistics; duration: number }>> {
   const apiKey = process.env.YOUTUBE_API_KEY;
   if (!apiKey || videoIds.length === 0) return new Map();
 
   const url = new URL(`${YOUTUBE_API_BASE}/videos`);
-  url.searchParams.set("part", "statistics");
+  url.searchParams.set("part", "statistics,contentDetails");
   url.searchParams.set("id", videoIds.join(","));
   url.searchParams.set("key", apiKey);
 
@@ -104,9 +119,12 @@ async function fetchVideoStatistics(
   if (!res.ok) return new Map();
 
   const data: VideosResponse = await res.json();
-  const map = new Map<string, VideoStatistics>();
+  const map = new Map<string, { statistics: VideoStatistics; duration: number }>();
   for (const item of data.items) {
-    map.set(item.id, item.statistics);
+    const duration = item.contentDetails?.duration
+      ? parseISO8601Duration(item.contentDetails.duration)
+      : 0;
+    map.set(item.id, { statistics: item.statistics, duration });
   }
   return map;
 }
