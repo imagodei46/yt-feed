@@ -31,4 +31,14 @@ export const CHANNELS: Channel[] = [
     name: "NewsPicks",
     uploadsPlaylistId: "UUfTnJmRQP79C4y_BMF_XrlA",
   },
+  {
+    id: "UCG_oqDSlIYEspNpd2H4zWhw",
+    name: "ReHacQ",
+    uploadsPlaylistId: "UUG_oqDSlIYEspNpd2H4zWhw",
+  },
+  {
+    id: "UCkKVQ_GNjd8FbAuT6xDcWgg",
+    name: "テレ東BIZ",
+    uploadsPlaylistId: "UUkKVQ_GNjd8FbAuT6xDcWgg",
+  },
 ];

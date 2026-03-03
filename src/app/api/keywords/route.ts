@@ -60,9 +60,10 @@ ${videoText}`,
 
     return NextResponse.json({ keywords });
   } catch (error) {
-    console.error("Keyword extraction error:", error);
+    const message = error instanceof Error ? error.message : String(error);
+    console.error("Keyword extraction error:", message);
     return NextResponse.json(
-      { error: "Failed to extract keywords" },
+      { error: "Failed to extract keywords", detail: message },
       { status: 500 }
     );
   }

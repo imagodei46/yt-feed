@@ -1,13 +1,15 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
-import { Video } from "@/types";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { Video, Keyword } from "@/types";
+import { CHANNELS } from "@/lib/channels";
 import ChannelFilter from "./ChannelFilter";
 import VideoGrid from "./VideoGrid";
 import ChannelTop3 from "./ChannelTop3";
 import KeywordTrends from "./KeywordTrends";
 import WeeklyBriefing from "./WeeklyBriefing";
-import CraftNotes from "./CraftNotes";
+import ChannelScoreboard from "./ChannelScoreboard";
+import KeywordGraph from "./KeywordGraph";
 import RefreshButton from "./RefreshButton";
 
 type SortMode = "date" | "views";
@@ -22,15 +24,151 @@ export default function Dashboard({ videos }: DashboardProps) {
   const [sortMode, setSortMode] = useState<SortMode>("date");
   const [viewMode, setViewMode] = useState<ViewMode>("feed");
   const [keywordVideoIds, setKeywordVideoIds] = useState<string[] | null>(null);
+  const [selectedKeyword, setSelectedKeyword] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [keywords, setKeywords] = useState<Keyword[]>([]);
+  const [keywordsLoading, setKeywordsLoading] = useState(true);
+  const [keywordsError, setKeywordsError] = useState(false);
+
+  // Filter out channel names from keywords (noise, not meaningful topics)
+  const channelNameSet = useMemo(() => {
+    const set = new Set<string>();
+    for (const ch of CHANNELS) {
+      set.add(ch.name.toLowerCase());
+      set.add(ch.name.toLowerCase().replace(/\s+/g, ""));
+    }
+    return set;
+  }, []);
+
+  const filterChannelNames = useCallback(
+    (kws: Keyword[]) =>
+      kws.filter(
+        (k) =>
+          !channelNameSet.has(k.word.toLowerCase()) &&
+          !channelNameSet.has(k.word.toLowerCase().replace(/\s+/g, ""))
+      ),
+    [channelNameSet]
+  );
 
   const handleRefreshStart = useCallback(() => setIsRefreshing(true), []);
   const handleRefreshEnd = useCallback(() => setIsRefreshing(false), []);
 
+  const handleKeywordSelect = useCallback((word: string | null, videoIds: string[] | null) => {
+    setSelectedKeyword(word);
+    setKeywordVideoIds(videoIds);
+  }, []);
+
+  // Local keyword extraction fallback (no AI needed)
+  const extractLocalKeywords = useCallback((): Keyword[] => {
+    // Common stop words to filter out
+    const stopWords = new Set([
+      "the", "a", "an", "is", "are", "was", "were", "be", "been",
+      "to", "of", "in", "for", "on", "with", "at", "by", "from",
+      "it", "this", "that", "and", "or", "but", "not", "no",
+      "what", "which", "who", "how", "when", "where", "why",
+      "can", "will", "do", "does", "did", "has", "have", "had",
+      "its", "his", "her", "our", "your", "their", "my",
+      "all", "each", "every", "both", "more", "most", "some",
+      "than", "too", "very", "just", "about", "into", "over",
+      // Japanese particles / common words
+      "の", "に", "は", "を", "が", "で", "と", "も", "か", "な",
+      "する", "した", "して", "です", "ます", "ない", "ある", "いる",
+      "から", "まで", "より", "へ", "という", "こと", "もの", "ため",
+      "など", "これ", "それ", "あの", "この", "その",
+      // Common YouTube title noise
+      "【", "】", "「", "」", "｜", "|", "!", "?", "…", "、", "。",
+      "#", "vol", "ep", "part",
+    ]);
+
+    const wordVideos = new Map<string, Set<string>>();
+
+    for (const v of videos) {
+      // Split title into meaningful tokens (2+ chars, not stop words)
+      const tokens = v.title
+        .replace(/[【】「」｜|（）()《》〈〉\[\]#!?！？…、。.,]/g, " ")
+        .split(/\s+/)
+        .map((t) => t.trim())
+        .filter(
+          (t) =>
+            t.length >= 2 &&
+            !stopWords.has(t.toLowerCase()) &&
+            !/^\d+$/.test(t)
+        );
+
+      for (const token of tokens) {
+        const set = wordVideos.get(token) ?? new Set();
+        set.add(v.id);
+        wordVideos.set(token, set);
+      }
+    }
+
+    return [...wordVideos.entries()]
+      .filter(([, ids]) => ids.size >= 2) // appears in 2+ videos
+      .sort((a, b) => b[1].size - a[1].size)
+      .slice(0, 12)
+      .map(([word, ids]) => ({
+        word,
+        count: ids.size,
+        videoIds: [...ids],
+      }));
+  }, [videos]);
+
+  // Fetch keywords once, share with KeywordTrends + KeywordGraph
+  const fetchKeywords = useCallback(() => {
+    if (videos.length === 0) return;
+
+    setKeywordsLoading(true);
+    setKeywordsError(false);
+    fetch("/api/keywords", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        videos: videos.map((v) => ({
+          id: v.id,
+          title: v.title,
+          description: v.description,
+        })),
+      }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("API error");
+        return res.json();
+      })
+      .then((data) => {
+        if (data.keywords && data.keywords.length > 0) {
+          setKeywords(filterChannelNames(data.keywords));
+        } else {
+          // API returned empty — use local fallback
+          setKeywords(filterChannelNames(extractLocalKeywords()));
+        }
+      })
+      .catch(() => {
+        // API failed — use local fallback instead of showing error
+        const local = filterChannelNames(extractLocalKeywords());
+        if (local.length > 0) {
+          setKeywords(local);
+        } else {
+          setKeywordsError(true);
+        }
+      })
+      .finally(() => setKeywordsLoading(false));
+  }, [videos, extractLocalKeywords, filterChannelNames]);
+
+  useEffect(() => {
+    fetchKeywords();
+  }, [fetchKeywords]);
+
+  // Filter to this week's videos for the feed
+  const thisWeekVideos = useMemo(() => {
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 7);
+    return videos.filter((v) => new Date(v.publishedAt) >= cutoff);
+  }, [videos]);
+
   const sortedVideos = useMemo(() => {
     let filtered = selectedChannel
-      ? videos.filter((v) => v.channelId === selectedChannel)
-      : videos;
+      ? thisWeekVideos.filter((v) => v.channelId === selectedChannel)
+      : thisWeekVideos;
 
     if (keywordVideoIds) {
       const idSet = new Set(keywordVideoIds);
@@ -43,7 +181,7 @@ export default function Dashboard({ videos }: DashboardProps) {
       }
       return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
     });
-  }, [videos, selectedChannel, sortMode, keywordVideoIds]);
+  }, [thisWeekVideos, selectedChannel, sortMode, keywordVideoIds]);
 
   return (
     <div className="space-y-6">
@@ -73,50 +211,55 @@ export default function Dashboard({ videos }: DashboardProps) {
 
       {viewMode === "feed" ? (
         <>
-          {/* Top section: briefing + notes side by side */}
-          <div className="grid gap-4 lg:grid-cols-5">
-            <div className="lg:col-span-3">
-              <WeeklyBriefing videos={videos} />
-            </div>
-            <div className="lg:col-span-2">
-              <CraftNotes videos={videos} />
-            </div>
+          {/* Top section: 3-column intelligence panel */}
+          <div className="grid gap-4 lg:grid-cols-3">
+            <WeeklyBriefing videos={videos} />
+            <KeywordGraph keywords={keywords} loading={keywordsLoading} error={keywordsError} onRetry={fetchKeywords} selectedKeyword={selectedKeyword} onKeywordSelect={handleKeywordSelect} />
+            <ChannelScoreboard videos={videos} />
           </div>
 
-          {/* Filter area: channel → keywords → sort */}
-          <ChannelFilter
-            selected={selectedChannel}
-            onSelect={setSelectedChannel}
-          />
-          <KeywordTrends videos={videos} onKeywordSelect={setKeywordVideoIds} />
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <p className="text-sm text-slate-400">
-                {sortedVideos.length}개의 영상
-              </p>
-              <RefreshButton onRefreshStart={handleRefreshStart} onRefreshEnd={handleRefreshEnd} />
-            </div>
-            <div className="inline-flex rounded-lg bg-slate-800 p-0.5 text-sm">
-              <button
-                onClick={() => setSortMode("date")}
-                className={`rounded-md px-3 py-1.5 font-medium transition-colors ${
-                  sortMode === "date"
-                    ? "bg-white text-slate-900 shadow-sm"
-                    : "text-slate-400 hover:text-slate-200"
-                }`}
-              >
-                최신순
-              </button>
-              <button
-                onClick={() => setSortMode("views")}
-                className={`rounded-md px-3 py-1.5 font-medium transition-colors ${
-                  sortMode === "views"
-                    ? "bg-white text-slate-900 shadow-sm"
-                    : "text-slate-400 hover:text-slate-200"
-                }`}
-              >
-                조회수순
-              </button>
+          {/* Sticky filter bar */}
+          <div className="sticky top-0 z-10 -mx-4 space-y-3 bg-[#0b1120]/95 px-4 pb-3 pt-2 backdrop-blur-sm">
+            <ChannelFilter
+              selected={selectedChannel}
+              onSelect={setSelectedChannel}
+            />
+            <KeywordTrends keywords={keywords} loading={keywordsLoading} selectedKeyword={selectedKeyword} onKeywordSelect={handleKeywordSelect} />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <p className="text-sm text-slate-400">
+                  {sortedVideos.length === thisWeekVideos.length ? (
+                    <>이번 주 {thisWeekVideos.length}개의 영상</>
+                  ) : (
+                    <>이번 주 {thisWeekVideos.length}개 중 <span className="font-medium text-white">{sortedVideos.length}개</span> 표시 중</>
+                  )}
+                </p>
+                <RefreshButton onRefreshStart={handleRefreshStart} onRefreshEnd={handleRefreshEnd} />
+              </div>
+              <div className="inline-flex rounded-lg bg-slate-800 p-0.5 text-sm">
+                <button
+                  onClick={() => setSortMode("date")}
+                  aria-pressed={sortMode === "date"}
+                  className={`rounded-md px-3 py-1.5 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-400/50 ${
+                    sortMode === "date"
+                      ? "bg-slate-600 text-white shadow-sm"
+                      : "text-slate-400 hover:text-slate-200"
+                  }`}
+                >
+                  최신순
+                </button>
+                <button
+                  onClick={() => setSortMode("views")}
+                  aria-pressed={sortMode === "views"}
+                  className={`rounded-md px-3 py-1.5 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-400/50 ${
+                    sortMode === "views"
+                      ? "bg-slate-600 text-white shadow-sm"
+                      : "text-slate-400 hover:text-slate-200"
+                  }`}
+                >
+                  조회수순
+                </button>
+              </div>
             </div>
           </div>
           {isRefreshing ? (
@@ -143,7 +286,7 @@ export default function Dashboard({ videos }: DashboardProps) {
         <>
           <div className="flex items-center justify-between">
             <p className="text-sm text-slate-400">
-              채널별 조회수 기준 인기 영상
+              채널별 인기 영상 <span className="text-slate-600">· 최근 30일 · 조회수 기준</span>
             </p>
             <RefreshButton onRefreshStart={handleRefreshStart} onRefreshEnd={handleRefreshEnd} />
           </div>

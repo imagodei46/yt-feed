@@ -3,6 +3,22 @@
 import { useState } from "react";
 import { SummarizeResponse } from "@/types";
 
+const SparkleIcon = ({ className }: { className?: string }) => (
+  <svg
+    className={className}
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={1.5}
+    stroke="currentColor"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 0 0-2.455 2.456Z"
+    />
+  </svg>
+);
+
 interface SummarySectionProps {
   videoId: string;
   title: string;
@@ -44,29 +60,32 @@ export default function SummarySection({
     return (
       <button
         onClick={handleSummarize}
-        className="mt-3 flex items-center gap-1.5 text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors"
+        className="flex w-full items-center justify-between px-4 py-3 text-sm font-medium text-blue-400 transition-colors hover:bg-blue-500/5 hover:text-blue-300"
       >
+        <span className="flex items-center gap-1.5">
+          <SparkleIcon className="h-4 w-4" />
+          AI 요약 보기
+        </span>
         <svg
-          className="h-4 w-4"
+          className="h-4 w-4 text-slate-600"
           fill="none"
           viewBox="0 0 24 24"
-          strokeWidth={1.5}
+          strokeWidth={2}
           stroke="currentColor"
         >
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
-            d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 0 0-2.455 2.456Z"
+            d="m8.25 4.5 7.5 7.5-7.5 7.5"
           />
         </svg>
-        AI 요약 보기
       </button>
     );
   }
 
   if (status === "loading") {
     return (
-      <div className="mt-3 flex items-center gap-2 text-sm text-slate-400">
+      <div className="flex items-center gap-2 px-4 py-3 text-sm text-slate-400">
         <div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-600 border-t-blue-400" />
         요약 생성 중...
       </div>
@@ -75,7 +94,7 @@ export default function SummarySection({
 
   if (status === "error") {
     return (
-      <div className="mt-3 space-y-1">
+      <div className="space-y-1 px-4 py-3">
         <p className="text-sm text-red-400">요약 생성에 실패했습니다.</p>
         <button
           onClick={handleSummarize}
@@ -88,24 +107,14 @@ export default function SummarySection({
   }
 
   return (
-    <div className="mt-3 rounded-lg bg-blue-500/10 p-3">
-      <div className="mb-1 flex items-center gap-1.5 text-xs font-medium text-blue-400">
-        <svg
-          className="h-3.5 w-3.5"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 0 0-2.455 2.456Z"
-          />
-        </svg>
-        AI 요약 {source === "description" && "(설명 기반)"}
+    <div className="px-4 py-3">
+      <div className="rounded-lg bg-blue-500/10 p-3">
+        <div className="mb-1 flex items-center gap-1.5 text-xs font-medium text-blue-400">
+          <SparkleIcon className="h-3.5 w-3.5" />
+          AI 요약 {source === "description" && "(설명 기반)"}
+        </div>
+        <p className="text-sm leading-relaxed text-slate-300">{summary}</p>
       </div>
-      <p className="text-sm leading-relaxed text-slate-300">{summary}</p>
     </div>
   );
 }

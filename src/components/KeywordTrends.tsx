@@ -1,65 +1,32 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Video, Keyword } from "@/types";
+import { Keyword } from "@/types";
 
 interface KeywordTrendsProps {
-  videos: Video[];
-  onKeywordSelect: (videoIds: string[] | null) => void;
+  keywords: Keyword[];
+  loading: boolean;
+  selectedKeyword: string | null;
+  onKeywordSelect: (word: string | null, videoIds: string[] | null) => void;
 }
 
 export default function KeywordTrends({
-  videos,
+  keywords,
+  loading,
+  selectedKeyword,
   onKeywordSelect,
 }: KeywordTrendsProps) {
-  const [keywords, setKeywords] = useState<Keyword[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [selected, setSelected] = useState<string | null>(null);
-  const [error, setError] = useState(false);
-
-  useEffect(() => {
-    if (videos.length === 0) return;
-
-    setLoading(true);
-    setError(false);
-
-    fetch("/api/keywords", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        videos: videos.map((v) => ({
-          id: v.id,
-          title: v.title,
-          description: v.description,
-        })),
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.keywords) {
-          setKeywords(data.keywords);
-        }
-      })
-      .catch(() => setError(true))
-      .finally(() => setLoading(false));
-  }, [videos]);
-
   const handleClick = (keyword: Keyword) => {
-    if (selected === keyword.word) {
-      setSelected(null);
-      onKeywordSelect(null);
+    if (selectedKeyword === keyword.word) {
+      onKeywordSelect(null, null);
     } else {
-      setSelected(keyword.word);
-      onKeywordSelect(keyword.videoIds);
+      onKeywordSelect(keyword.word, keyword.videoIds);
     }
   };
-
-  if (error) return null;
 
   if (loading) {
     return (
       <div className="flex items-center gap-2 text-sm text-slate-400">
-        <div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-slate-600" />
+        <div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-600 border-t-cyan-400" />
         키워드 분석 중...
       </div>
     );
@@ -78,22 +45,29 @@ export default function KeywordTrends({
           overflowX: "auto",
           gap: "0.5rem",
           scrollbarWidth: "none",
-          WebkitMaskImage: "linear-gradient(to right, black 92%, transparent 100%)",
-          maskImage: "linear-gradient(to right, black 92%, transparent 100%)",
+          WebkitMaskImage: "linear-gradient(to right, black 80%, transparent 100%)",
+          maskImage: "linear-gradient(to right, black 80%, transparent 100%)",
         }}
       >
         {keywords.map((kw) => (
           <button
             key={kw.word}
             onClick={() => handleClick(kw)}
-            className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1 text-sm transition-colors ${
-              selected === kw.word
-                ? "bg-white text-slate-900"
-                : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+            aria-pressed={selectedKeyword === kw.word}
+            className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-400/50 ${
+              selectedKeyword === kw.word
+                ? "bg-white text-slate-900 shadow-sm"
+                : "border border-slate-700 bg-transparent text-slate-400 hover:border-slate-500 hover:text-slate-200"
             }`}
           >
             {kw.word}
-            <span className="text-xs text-slate-500">
+            <span
+              className={`rounded-full px-1.5 text-xs ${
+                selectedKeyword === kw.word
+                  ? "bg-slate-200 text-slate-700"
+                  : "bg-slate-800 text-slate-500"
+              }`}
+            >
               {kw.count}
             </span>
           </button>

@@ -9,16 +9,18 @@ export function formatDate(dateString: string): string {
   if (diffHours < 24) return `${diffHours}시간 전`;
   if (diffDays < 7) return `${diffDays}일 전`;
   if (diffDays < 30) return `${Math.floor(diffDays / 7)}주 전`;
-
-  return date.toLocaleDateString("ko-KR", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
+  if (diffDays < 365) return `${Math.floor(diffDays / 30)}달 전`;
+  return `${Math.floor(diffDays / 365)}년 전`;
 }
 
 export function formatCount(count: number): string {
-  if (count >= 10000) return `${(count / 10000).toFixed(1)}만`;
-  if (count >= 1000) return `${(count / 1000).toFixed(1)}천`;
+  if (count >= 10000) {
+    const val = (count / 10000).toFixed(1);
+    return `${val.endsWith(".0") ? val.slice(0, -2) : val}만`;
+  }
+  if (count >= 1000) {
+    const val = (count / 1000).toFixed(1);
+    return `${val.endsWith(".0") ? val.slice(0, -2) : val}천`;
+  }
   return String(count);
 }

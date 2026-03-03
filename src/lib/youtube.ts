@@ -36,9 +36,9 @@ interface VideosResponse {
   }>;
 }
 
-export async function fetchChannelVideos(
+async function fetchChannelVideos(
   channel: Channel,
-  maxResults = 5
+  maxResults = 10
 ): Promise<Video[]> {
   const apiKey = process.env.YOUTUBE_API_KEY;
   if (!apiKey) throw new Error("YOUTUBE_API_KEY is not set");

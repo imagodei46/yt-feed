@@ -16,11 +16,6 @@ export interface Video {
   likeCount?: number;
 }
 
-export interface VideoWithSummary extends Video {
-  summary?: string;
-  summaryStatus?: "idle" | "loading" | "done" | "error";
-}
-
 export interface SummarizeRequest {
   videoId: string;
   title: string;
@@ -45,4 +40,6 @@ export interface BriefingEntry {
   keywords: string[];
   videoCount: number;
   createdAt: string;
+  // Video IDs referenced by each trend (index 0 = trend 1, etc.)
+  trendVideoIds?: string[][];
 }
