@@ -37,3 +37,12 @@ export interface Keyword {
   count: number;
   videoIds: string[];
 }
+
+export interface BriefingEntry {
+  weekStart: string;
+  weekEnd: string;
+  briefing: string;
+  keywords: string[];
+  videoCount: number;
+  createdAt: string;
+}
