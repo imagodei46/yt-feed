@@ -1,0 +1,205 @@
+{
+  "folders": [
+    {
+      "name": "Daily Journal",
+      "id": "8C731A4A-E087-4537-A6D2-CD80C8E4AC0F",
+      "description": "일상 성찰, AI 시대 사고법, 커리어 전환 기록",
+      "notes": [
+        {
+          "title": "AI 시대, 나의 사고 유지·증강 시스템",
+          "keywords": ["AI", "사고법", "생산성", "시스템", "자기계발", "행동"]
+        },
+        {
+          "title": "AI 시대 더욱 중요해지는 것",
+          "keywords": ["AI", "커뮤니티", "IP", "브랜드", "신뢰", "복제불가"]
+        },
+        {
+          "title": "카지타니 켄토(POSTS 대표)",
+          "keywords": ["생성AI", "XR", "스타트업", "일본", "테크", "비즈니스", "어드바이저"]
+        },
+        {
+          "title": "보존의 문법",
+          "keywords": ["보존", "문화", "전통", "가치"]
+        },
+        {
+          "title": "안티 비전",
+          "keywords": ["비전", "반대", "전략", "경영"]
+        },
+        {
+          "title": "Energy",
+          "keywords": ["에너지", "활력", "생산성", "루틴"]
+        },
+        {
+          "title": "키워드 충돌 기록",
+          "keywords": ["키워드", "사고", "메모", "기록"]
+        },
+        {
+          "title": "AC2 셀프 커리큘럼",
+          "keywords": ["애자일", "코칭", "성장", "자기계발", "커리큘럼"]
+        },
+        {
+          "title": "지속 패턴 트래커",
+          "keywords": ["습관", "패턴", "지속", "트래킹", "루틴"]
+        },
+        {
+          "title": "나의 작동 패턴",
+          "keywords": ["자기이해", "패턴", "행동", "성찰"]
+        },
+        {
+          "title": "나의 '여덟 단어'",
+          "keywords": ["자기정의", "가치관", "정체성", "커리어"]
+        }
+      ]
+    },
+    {
+      "name": "Study",
+      "id": "96EC30AB-BF5A-4314-BE11-4619E26F9D4D",
+      "description": "학습 노트 — AI, VC, 코딩, 스터디 그룹 등",
+      "notes": [
+        {
+          "title": "AI Agent",
+          "keywords": ["AI Agent", "기술스택", "MCP", "LLM", "자동화"]
+        },
+        {
+          "title": "Reflections - 1~2Q",
+          "keywords": ["회고", "분기", "목표", "성찰"]
+        },
+        {
+          "title": "Study/Digging: 횃불 하나 들고 갑니다!",
+          "keywords": ["탐구", "동기부여", "도전"]
+        },
+        {
+          "title": "Study/Digging: CCC 髙橋誉則 社長",
+          "keywords": ["CCC", "다카하시", "경영", "일본기업", "TSUTAYA"]
+        },
+        {
+          "title": "Study/Digging: UPMD Prompting",
+          "keywords": ["프롬프트", "AI", "프롬프트엔지니어링"]
+        },
+        {
+          "title": "Study/Digging: 蔦屋書店 代官山",
+          "keywords": ["쓰타야", "서점", "일본", "라이프스타일", "공간디자인"]
+        },
+        {
+          "title": "Study/VC: 스타트업 바이블",
+          "keywords": ["스타트업", "창업", "VC", "투자", "사업계획"]
+        },
+        {
+          "title": "Study/VC: 1% 가능성에 투자하는 사람들",
+          "keywords": ["VC", "벤처캐피탈", "투자", "스타트업"]
+        },
+        {
+          "title": "Study/VC: Zebra",
+          "keywords": ["제브라", "임팩트", "사회적기업", "지속가능"]
+        },
+        {
+          "title": "Study/VC: NEWLOCAL",
+          "keywords": ["로컬", "지역활성화", "커뮤니티", "일본"]
+        },
+        {
+          "title": "Study/Coding: Claude Code",
+          "keywords": ["Claude", "코딩", "AI", "개발도구"]
+        },
+        {
+          "title": "Study/Coding: AI Engineering 핵심 개념 정리",
+          "keywords": ["AI엔지니어링", "기술", "개발", "LLM"]
+        },
+        {
+          "title": "Study/Coding: 매일 아침 자동 정보 수집 시스템",
+          "keywords": ["자동화", "정보수집", "Obsidian", "시스템"]
+        },
+        {
+          "title": "Study/ASG & ANC: Claude Code 뽀개기",
+          "keywords": ["Claude Code", "AI", "캠프", "학습"]
+        },
+        {
+          "title": "Study/ASG & ANC: AI Native Camp Day 3",
+          "keywords": ["ANC", "AI네이티브", "캠프", "학습"]
+        }
+      ]
+    },
+    {
+      "name": "Book",
+      "id": "9BFC4D55-BF24-4FCB-A978-E6AE59D25A40",
+      "description": "독서 노트 — 핵심 하이라이트 + 인사이트 정리",
+      "notes": [
+        {
+          "title": "일의 감각 - 조수용",
+          "keywords": ["감각", "오너십", "취향", "공감", "본질", "리더십", "기획"]
+        },
+        {
+          "title": "이나모리 가즈오의 인생을 바라보는 안목",
+          "keywords": ["이나모리 가즈오", "경영철학", "교세라", "JAL", "일본 경영"]
+        },
+        {
+          "title": "돈의 심리학",
+          "keywords": ["투자", "재테크", "심리학", "부", "복리"]
+        },
+        {
+          "title": "아비투스(HABITUS)",
+          "keywords": ["상류층", "습관", "사회적자본", "문화자본"]
+        },
+        {
+          "title": "원씽(The One Thing)",
+          "keywords": ["집중", "생산성", "우선순위", "목표설정"]
+        },
+        {
+          "title": "당신만 모르는 일의 법칙 51",
+          "keywords": ["직장생활", "커리어", "조직문화"]
+        },
+        {
+          "title": "직장인이여 회계하라",
+          "keywords": ["회계", "재무제표", "경영분석"]
+        },
+        {
+          "title": "행동하지 않으면 인생은 바뀌지 않는다",
+          "keywords": ["행동력", "자기계발", "동기부여"]
+        },
+        {
+          "title": "100만 클릭 터지는 독한 필살기",
+          "keywords": ["마케팅", "콘텐츠", "SNS", "바이럴"]
+        },
+        {
+          "title": "インド式「グルノート」の秘密",
+          "keywords": ["학습법", "노트정리", "공부법"]
+        },
+        {
+          "title": "불안은 행동을 이긴다(Level Up)",
+          "keywords": ["불안", "행동", "성장"]
+        },
+        {
+          "title": "거인의 노트 / 거인의 공부 - 김익한",
+          "keywords": ["독서법", "공부법", "메모", "지식관리"]
+        },
+        {
+          "title": "돈의 방정식",
+          "keywords": ["재테크", "투자", "경제"]
+        },
+        {
+          "title": "생각의 도약",
+          "keywords": ["창의성", "혁신", "사고법"]
+        },
+        {
+          "title": "센트럴 세인트 마틴 파운데이션",
+          "keywords": ["디자인", "예술교육", "창의성"]
+        }
+      ]
+    },
+    {
+      "name": "Share",
+      "id": "AC516A98-4B2C-4F3E-819C-B07E06133396",
+      "description": "외부 공유용 문서",
+      "notes": [
+        {
+          "title": "FIKAピカ",
+          "keywords": ["FIKA", "일본", "커뮤니티", "교류"]
+        },
+        {
+          "title": "생글즈_4기",
+          "keywords": ["스터디", "커뮤니티", "글쓰기", "성장"]
+        }
+      ]
+    }
+  ],
+  "updatedAt": "2026-03-03"
+}
