@@ -90,33 +90,33 @@ export default function Dashboard({ videos }: DashboardProps) {
           />
           <KeywordTrends videos={videos} onKeywordSelect={setKeywordVideoIds} />
           <div className="flex items-center justify-between">
-            <p className="text-sm text-slate-400">
-              {sortedVideos.length}개의 영상
-            </p>
             <div className="flex items-center gap-2">
-              <div className="flex gap-1 text-sm">
-                <button
-                  onClick={() => setSortMode("date")}
-                  className={`rounded-full px-3 py-1.5 transition-colors ${
-                    sortMode === "date"
-                      ? "bg-white text-slate-900"
-                      : "bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200"
-                  }`}
-                >
-                  최신순
-                </button>
-                <button
-                  onClick={() => setSortMode("views")}
-                  className={`rounded-full px-3 py-1.5 transition-colors ${
-                    sortMode === "views"
-                      ? "bg-white text-slate-900"
-                      : "bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200"
-                  }`}
-                >
-                  조회수순
-                </button>
-              </div>
+              <p className="text-sm text-slate-400">
+                {sortedVideos.length}개의 영상
+              </p>
               <RefreshButton onRefreshStart={handleRefreshStart} onRefreshEnd={handleRefreshEnd} />
+            </div>
+            <div className="inline-flex rounded-lg bg-slate-800 p-0.5 text-sm">
+              <button
+                onClick={() => setSortMode("date")}
+                className={`rounded-md px-3 py-1.5 font-medium transition-colors ${
+                  sortMode === "date"
+                    ? "bg-white text-slate-900 shadow-sm"
+                    : "text-slate-400 hover:text-slate-200"
+                }`}
+              >
+                최신순
+              </button>
+              <button
+                onClick={() => setSortMode("views")}
+                className={`rounded-md px-3 py-1.5 font-medium transition-colors ${
+                  sortMode === "views"
+                    ? "bg-white text-slate-900 shadow-sm"
+                    : "text-slate-400 hover:text-slate-200"
+                }`}
+              >
+                조회수순
+              </button>
             </div>
           </div>
           {isRefreshing ? (
