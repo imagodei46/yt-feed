@@ -3,19 +3,21 @@ import VideoCard from "./VideoCard";
 
 interface VideoGridProps {
   videos: Video[];
+  variant?: "longform" | "shortform";
 }
 
-export default function VideoGrid({ videos }: VideoGridProps) {
+export default function VideoGrid({ videos, variant = "longform" }: VideoGridProps) {
   if (videos.length === 0) {
-    return (
-      <div className="py-20 text-center text-slate-500">
-        표시할 영상이 없습니다.
-      </div>
-    );
+    return null;
   }
 
+  const gridClass =
+    variant === "shortform"
+      ? "grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
+      : "grid gap-4 sm:grid-cols-2 lg:grid-cols-3";
+
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className={gridClass}>
       {videos.map((video) => (
         <VideoCard key={video.id} video={video} />
       ))}
