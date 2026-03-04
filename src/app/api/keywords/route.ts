@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { generateText } from "ai";
 import { anthropic } from "@ai-sdk/anthropic";
 import { Keyword } from "@/types";
+import { CHANNELS } from "@/lib/channels";
 
 interface KeywordsRequestBody {
   videos: Array<{
@@ -31,6 +32,8 @@ export async function POST(request: NextRequest) {
       )
       .join("\n\n");
 
+    const channelNames = CHANNELS.map((ch) => ch.name).join(", ");
+
     const { text } = await generateText({
       model: anthropic("claude-haiku-4-5-20251001"),
       system:
@@ -43,6 +46,7 @@ export async function POST(request: NextRequest) {
 규칙:
 - 키워드는 한국어로 번역 (예: AI, 스타트업, 엔저, 반도체 등)
 - 영어 고유명사는 그대로 유지 (예: AI, ChatGPT, Tesla)
+- 채널명 및 채널명의 일부는 절대 키워드에 포함하지 마세요. 제외 대상: ${channelNames}
 - 각 키워드가 등장하는 영상의 id 목록을 포함
 - count는 해당 키워드가 관련된 영상 수
 

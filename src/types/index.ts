@@ -24,7 +24,7 @@ export interface SummarizeRequest {
 
 export interface SummarizeResponse {
   summary: string;
-  source: "transcript" | "description";
+  source: "transcript" | "description" | "unavailable";
 }
 
 export interface Keyword {

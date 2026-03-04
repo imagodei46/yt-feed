@@ -30,12 +30,16 @@ export default function Dashboard({ videos }: DashboardProps) {
   const [keywordsLoading, setKeywordsLoading] = useState(true);
   const [keywordsError, setKeywordsError] = useState(false);
 
-  // Filter out channel names from keywords (noise, not meaningful topics)
+  // Filter out channel names (and partial names) from keywords
   const channelNameSet = useMemo(() => {
     const set = new Set<string>();
     for (const ch of CHANNELS) {
       set.add(ch.name.toLowerCase());
       set.add(ch.name.toLowerCase().replace(/\s+/g, ""));
+      // Add individual words from channel names (e.g. "News" from "NewsPicks")
+      for (const part of ch.name.split(/[\s\-_]|(?=[A-Z])/)) {
+        if (part.length >= 3) set.add(part.toLowerCase());
+      }
     }
     return set;
   }, []);

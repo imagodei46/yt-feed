@@ -111,7 +111,7 @@ export default function SummarySection({
       <div className="rounded-lg bg-blue-500/10 p-3">
         <div className="mb-1 flex items-center gap-1.5 text-xs font-medium text-blue-400">
           <SparkleIcon className="h-3.5 w-3.5" />
-          AI 요약 {source === "description" && "(설명 기반)"}
+          AI 요약 {source === "description" && "(설명 기반)"}{source === "unavailable" && "(정보 부족)"}
         </div>
         <p className="text-sm leading-relaxed text-slate-300">{summary}</p>
       </div>
