@@ -98,7 +98,7 @@ export default function ChannelScoreboard({ videos }: ChannelScoreboardProps) {
         Channel Scoreboard
       </p>
       <p className="mb-1 text-xs font-bold text-white">
-        이번 주 채널별 성과
+        최근 30일 채널별 성과
       </p>
       <p className="mb-3 text-[10px] text-slate-500">
         영상별 조회수 추이

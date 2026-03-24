@@ -62,6 +62,13 @@ export default function Dashboard({ videos }: DashboardProps) {
     setKeywordVideoIds(videoIds);
   }, []);
 
+  // Filter to recent videos (shared by keywords + video grid)
+  const recentVideos = useMemo(() => {
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 30);
+    return videos.filter((v) => new Date(v.publishedAt) >= cutoff);
+  }, [videos]);
+
   // Local keyword extraction fallback (no AI needed)
   const extractLocalKeywords = useCallback((): Keyword[] => {
     // Common stop words to filter out
@@ -86,7 +93,7 @@ export default function Dashboard({ videos }: DashboardProps) {
 
     const wordVideos = new Map<string, Set<string>>();
 
-    for (const v of videos) {
+    for (const v of recentVideos) {
       // Split title into meaningful tokens (2+ chars, not stop words)
       const tokens = v.title
         .replace(/[【】「」｜|（）()《》〈〉\[\]#!?！？…、。.,]/g, " ")
@@ -115,11 +122,11 @@ export default function Dashboard({ videos }: DashboardProps) {
         count: ids.size,
         videoIds: [...ids],
       }));
-  }, [videos]);
+  }, [recentVideos]);
 
   // Fetch keywords once, share with KeywordTrends + KeywordGraph
   const fetchKeywords = useCallback(() => {
-    if (videos.length === 0) return;
+    if (recentVideos.length === 0) return;
 
     setKeywordsLoading(true);
     setKeywordsError(false);
@@ -127,7 +134,7 @@ export default function Dashboard({ videos }: DashboardProps) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        videos: videos.map((v) => ({
+        videos: recentVideos.map((v) => ({
           id: v.id,
           title: v.title,
           description: v.description,
@@ -156,23 +163,16 @@ export default function Dashboard({ videos }: DashboardProps) {
         }
       })
       .finally(() => setKeywordsLoading(false));
-  }, [videos, extractLocalKeywords, filterChannelNames]);
+  }, [recentVideos, extractLocalKeywords, filterChannelNames]);
 
   useEffect(() => {
     fetchKeywords();
   }, [fetchKeywords]);
 
-  // Filter to this week's videos for the feed
-  const thisWeekVideos = useMemo(() => {
-    const cutoff = new Date();
-    cutoff.setDate(cutoff.getDate() - 7);
-    return videos.filter((v) => new Date(v.publishedAt) >= cutoff);
-  }, [videos]);
-
   const sortedVideos = useMemo(() => {
     let filtered = selectedChannel
-      ? thisWeekVideos.filter((v) => v.channelId === selectedChannel)
-      : thisWeekVideos;
+      ? recentVideos.filter((v) => v.channelId === selectedChannel)
+      : recentVideos;
 
     if (keywordVideoIds) {
       const idSet = new Set(keywordVideoIds);
@@ -185,7 +185,7 @@ export default function Dashboard({ videos }: DashboardProps) {
       }
       return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
     });
-  }, [thisWeekVideos, selectedChannel, sortMode, keywordVideoIds]);
+  }, [recentVideos, selectedChannel, sortMode, keywordVideoIds]);
 
   return (
     <div className="space-y-6">
@@ -219,7 +219,7 @@ export default function Dashboard({ videos }: DashboardProps) {
           <div className="grid gap-4 lg:grid-cols-3">
             <WeeklyBriefing videos={videos} />
             <KeywordGraph keywords={keywords} loading={keywordsLoading} error={keywordsError} onRetry={fetchKeywords} selectedKeyword={selectedKeyword} onKeywordSelect={handleKeywordSelect} />
-            <ChannelScoreboard videos={videos} />
+            <ChannelScoreboard videos={recentVideos} />
           </div>
 
           {/* Sticky filter bar */}
@@ -232,10 +232,10 @@ export default function Dashboard({ videos }: DashboardProps) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <p className="text-sm text-slate-400">
-                  {sortedVideos.length === thisWeekVideos.length ? (
-                    <>이번 주 {thisWeekVideos.length}개의 영상</>
+                  {sortedVideos.length === recentVideos.length ? (
+                    <>최근 30일 {recentVideos.length}개의 영상</>
                   ) : (
-                    <>이번 주 {thisWeekVideos.length}개 중 <span className="font-medium text-white">{sortedVideos.length}개</span> 표시 중</>
+                    <>최근 30일 {recentVideos.length}개 중 <span className="font-medium text-white">{sortedVideos.length}개</span> 표시 중</>
                   )}
                 </p>
                 <RefreshButton onRefreshStart={handleRefreshStart} onRefreshEnd={handleRefreshEnd} />
